@@ -30,7 +30,7 @@ services:
     environment:
       DB_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/mlflow-db
       AWS_STORAGE_BUCKET: "${AWS_STORAGE_BUCKET}"
-    port:
+    ports:
       - 15000:8888
 
 volumes:
