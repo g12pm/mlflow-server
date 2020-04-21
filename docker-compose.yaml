@@ -22,9 +22,6 @@ services:
   mlflow:
     build: .
     container_name: mlflow
-    expose:
-      - 80
-      - 443
     depends_on:
       - postgresql
       - waitfordb
@@ -33,49 +30,8 @@ services:
     environment:
       DB_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/mlflow-db
       AWS_STORAGE_BUCKET: "${AWS_STORAGE_BUCKET}"
-      VIRTUAL_HOST: ${HOST}
-      VIRTUAL_PORT: 80
-      LETSENCRYPT_HOST: ${HOST}
-      LETSENCRYPT_EMAIL: example@gmail.com
-
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./${HOST}:/etc/nginx/htpasswd/${HOST}
-      - html:/usr/share/nginx/html
-      - dhparam:/etc/nginx/dhparam
-      - vhost:/etc/nginx/vhost.d
-      - certs:/etc/nginx/certs:ro
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - conf:/etc/nginx/conf.d
-    environment: 
-      DEFAULT_HOST: ${HOST}
-      DHPARAM_GENERATION: "false"
-      HTTPS_METHOD: noredirect
-    labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
-
-
-  letsencrypt-nginx-proxy-companion:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    container_name: nginx-proxy-lets-encrypt
-    restart: always
-    depends_on:
-      - nginx-proxy
-    volumes:
-      - conf:/etc/nginx/conf.d
-      - certs:/etc/nginx/certs:rw
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      NGINX_PROXY_CONTAINER: nginx-proxy
-
+    port:
+      - 15000:8888
 
 volumes:
   certs:
