@@ -4,6 +4,8 @@ services:
     image: dadarek/wait-for-dependencies
     depends_on:
       - postgresql
+    networks:
+      - backend
     command: postgresql:5432
 
   postgresql:
@@ -18,24 +20,37 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     hostname: postgresql
     restart: always
+    networks:
+      - backend
 
-  mlflow:
-    build: .
-    container_name: mlflow
+  web:
+    build: ./mlflow
+    image: mlflow_server
+    container_name: mlflow_server
+    networks:
+      - frontend
+      - backend
     depends_on:
       - postgresql
       - waitfordb
-    volumes:
-      - ${CREDENTIALS_PATH}:${PWD}/.aws
     environment:
       DB_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/mlflow-db
-      AWS_STORAGE_BUCKET: "${AWS_STORAGE_BUCKET}"
-    ports:
-      - 15000:8888
+      AWS_STORAGE_BUCKET: ${AWS_STORAGE_BUCKET}
 
-volumes:
-  certs:
-  html:
-  vhost:
-  dhparam:
-  conf:
+  nginx:
+    restart: always
+    build: ./nginx
+    image: mlflow_nginx
+    container_name: mlflow_nginx
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+    depends_on:
+      - web
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
