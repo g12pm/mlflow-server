@@ -15,15 +15,11 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     libpq-dev
 
-# TODO: GCPの設定をAWSに変更
 RUN pip install -U pip && \
     pip install awscli && \
     pip install psycopg2 mlflow
 
 COPY ./start.sh ./start.sh
 RUN chmod +x ./start.sh
-
-EXPOSE 80
-EXPOSE 443
 
 CMD ["./start.sh"]
