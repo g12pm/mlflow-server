@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install -U pip && \
     pip install awscli && \
-    pip install psycopg2 mlflow
+    pip install psycopg2 mlflow boto3
 
 COPY ./start.sh ./start.sh
 RUN chmod +x ./start.sh
